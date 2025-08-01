@@ -117,37 +117,26 @@ export default function handler(req, res) {
     });
   }
   
-  // 管理后台相关
-  if (url.startsWith('/admin/')) {
-    // 返回简单的管理页面
-    const adminHtml = `
-    <!DOCTYPE html>
-    <html lang="zh-CN">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>社区小饭桌 - 管理后台</title>
-        <style>
-            body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
-            .container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-            h1 { color: #333; text-align: center; }
-            .status { padding: 20px; background: #d4edda; border: 1px solid #c3e6cb; border-radius: 5px; color: #155724; }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <h1>🍱 社区小饭桌管理后台</h1>
-            <div class="status">
-                <h3>✅ 系统状态正常</h3>
-                <p>API服务已成功部署到Vercel</p>
-                <p>访问时间: ${new Date().toLocaleString('zh-CN')}</p>
-            </div>
-        </div>
-    </body>
-    </html>`;
+  // 管理后台登录API
+  if (url === '/api/admin/login' && method === 'POST') {
+    const { username, password } = req.body;
     
-    res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    return res.send(adminHtml);
+    // 简单的登录验证（实际项目中应该使用更安全的方式）
+    if (username === 'admin' && password === 'admin123') {
+      return res.json({
+        success: true,
+        message: '登录成功',
+        data: {
+          token: 'admin_token_' + Date.now(),
+          user: { username: 'admin', role: 'admin' }
+        }
+      });
+    } else {
+      return res.status(401).json({
+        success: false,
+        message: '用户名或密码错误'
+      });
+    }
   }
   
   // 404处理
