@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>最简测试</title>
+    <style>
+        body { font-family: Arial; margin: 50px; background: #f5f5f5; }
+        .box { background: white; padding: 30px; border-radius: 10px; max-width: 500px; }
+        button { background: #007bff; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-size: 16px; margin: 10px 0; width: 100%; }
+        button:hover { background: #0056b3; }
+        .result { background: #f8f9fa; border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; border-color: #c3e6cb; }
+        .error { background: #f8d7da; border-color: #f5c6cb; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h2>🔧 最简JavaScript测试</h2>
+        
+        <button onclick="alert('JavaScript正常工作！')">点击测试JavaScript</button>
+        
+        <button onclick="testBasic()">测试基础功能</button>
+        <div id="result">等待测试...</div>
+        
+        <button onclick="testAPI()">测试API连接</button>
+        <div id="apiResult">等待测试...</div>
+        
+        <hr>
+        <h3>手动测试登录</h3>
+        <input type="text" id="username" value="admin" placeholder="用户名" style="width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
+        <input type="password" id="password" value="password" placeholder="密码" style="width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ddd; border-radius: 3px;">
+        <button onclick="testLogin()">登录测试</button>
+        <div id="loginResult">等待测试...</div>
+    </div>
+
+    <script>
+        // 页面加载时立即执行
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('result').innerHTML = '✅ 页面加载完成，JavaScript可用';
+            document.getElementById('result').className = 'result success';
+        });
+        
+        function testBasic() {
+            var now = new Date();
+            document.getElementById('result').innerHTML = '✅ 基础测试成功！<br>时间: ' + now.toLocaleString();
+            document.getElementById('result').className = 'result success';
+        }
+        
+        function testAPI() {
+            document.getElementById('apiResult').innerHTML = '🔄 正在测试API...';
+            document.getElementById('apiResult').className = 'result';
+            
+            // 使用XMLHttpRequest而不是fetch，兼容性更好
+            var xhr = new XMLHttpRequest();
+            xhr.open('GET', 'http://localhost:3001/api/health', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        try {
+                            var data = JSON.parse(xhr.responseText);
+                            document.getElementById('apiResult').innerHTML = '✅ API连接成功！<br>状态: ' + xhr.status + '<br>响应: ' + JSON.stringify(data);
+                            document.getElementById('apiResult').className = 'result success';
+                        } catch (e) {
+                            document.getElementById('apiResult').innerHTML = '⚠️ API响应解析失败: ' + e.message;
+                            document.getElementById('apiResult').className = 'result error';
+                        }
+                    } else {
+                        document.getElementById('apiResult').innerHTML = '❌ API连接失败<br>状态: ' + xhr.status + '<br>错误: ' + xhr.statusText;
+                        document.getElementById('apiResult').className = 'result error';
+                    }
+                }
+            };
+            xhr.onerror = function() {
+                document.getElementById('apiResult').innerHTML = '❌ 网络错误，无法连接到API';
+                document.getElementById('apiResult').className = 'result error';
+            };
+            xhr.send();
+        }
+        
+        function testLogin() {
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            
+            document.getElementById('loginResult').innerHTML = '🔄 正在登录...';
+            document.getElementById('loginResult').className = 'result';
+            
+            var xhr = new XMLHttpRequest();
+            xhr.open('POST', 'http://localhost:3001/api/auth/login', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    try {
+                        var data = JSON.parse(xhr.responseText);
+                        if (xhr.status === 200 && data.success) {
+                            document.getElementById('loginResult').innerHTML = '✅ 登录成功！<br>管理员: ' + data.data.admin.name + '<br>Token: ' + data.data.token.substring(0, 20) + '...';
+                            document.getElementById('loginResult').className = 'result success';
+                            // 保存token
+                            localStorage.setItem('adminToken', data.data.token);
+                        } else {
+                            document.getElementById('loginResult').innerHTML = '❌ 登录失败<br>状态: ' + xhr.status + '<br>错误: ' + (data.message || '未知错误');
+                            document.getElementById('loginResult').className = 'result error';
+                        }
+                    } catch (e) {
+                        document.getElementById('loginResult').innerHTML = '❌ 响应解析失败: ' + e.message + '<br>原始响应: ' + xhr.responseText;
+                        document.getElementById('loginResult').className = 'result error';
+                    }
+                }
+            };
+            xhr.onerror = function() {
+                document.getElementById('loginResult').innerHTML = '❌ 网络错误，无法连接到登录API';
+                document.getElementById('loginResult').className = 'result error';
+            };
+            
+            var loginData = JSON.stringify({
+                username: username,
+                password: password
+            });
+            xhr.send(loginData);
+        }
+        
+        // 立即测试JavaScript是否工作
+        setTimeout(function() {
+            if (document.getElementById('result').innerHTML === '等待测试...') {
+                document.getElementById('result').innerHTML = '❌ JavaScript可能被禁用或有错误';
+                document.getElementById('result').className = 'result error';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

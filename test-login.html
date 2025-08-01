@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .info-box {
+            background: #e3f2fd;
+            border: 1px solid #2196f3;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .success {
+            background: #e8f5e8;
+            border-color: #4caf50;
+            color: #2e7d32;
+        }
+        .error {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #2196f3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #1976d2;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 管理后台登录测试</h1>
+        
+        <div class="info-box">
+            <h3>📋 默认登录凭据</h3>
+            <p><strong>用户名:</strong> admin</p>
+            <p><strong>密码:</strong> password</p>
+            <p><em>注意：这是系统预设的管理员账户</em></p>
+        </div>
+
+        <form id="loginForm">
+            <h3>登录测试</h3>
+            <input type="text" id="username" placeholder="用户名" value="admin">
+            <input type="password" id="password" placeholder="密码" value="password">
+            <button type="submit" id="loginBtn">登录测试</button>
+        </form>
+
+        <div id="result" style="margin-top: 20px;"></div>
+
+        <div style="margin-top: 30px;">
+            <h3>🔗 相关链接</h3>
+            <p><a href="http://localhost:3001/admin" target="_blank">打开管理后台</a></p>
+            <p><a href="http://localhost:5173" target="_blank">打开前端应用</a></p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('result');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            loginBtn.disabled = true;
+            loginBtn.textContent = '登录中...';
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    resultDiv.innerHTML = `
+                        <div class="info-box success">
+                            <h4>✅ 登录成功！</h4>
+                            <p><strong>管理员:</strong> ${data.data.admin.name}</p>
+                            <p><strong>用户名:</strong> ${data.data.admin.username}</p>
+                            <p><strong>Token:</strong> ${data.data.token.substring(0, 50)}...</p>
+                            <p><a href="http://localhost:3001/admin" target="_blank">现在可以访问管理后台了</a></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="info-box error">
+                            <h4>❌ 登录失败</h4>
+                            <p>${data.message}</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="info-box error">
+                        <h4>❌ 网络错误</h4>
+                        <p>无法连接到服务器: ${error.message}</p>
+                        <p>请确保后端服务器正在运行在 http://localhost:3001</p>
+                    </div>
+                `;
+            } finally {
+                loginBtn.disabled = false;
+                loginBtn.textContent = '登录测试';
+            }
+        });
+    </script>
+</body>
+</html>

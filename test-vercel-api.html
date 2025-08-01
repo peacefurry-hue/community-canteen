@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vercel API测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Vercel API测试</h1>
+        <p>测试部署到Vercel的API是否正常工作</p>
+
+        <div class="test-section">
+            <h3>🌐 线上API测试</h3>
+            <button onclick="testOnlineHealth()">测试线上健康检查</button>
+            <button onclick="testOnlineMenu()">测试线上菜品列表</button>
+            <button onclick="testOnlineCategories()">测试线上分类列表</button>
+            <button onclick="testOnlineAdmin()">测试线上管理后台</button>
+            <div id="online-result" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔗 直接链接测试</h3>
+            <p>点击以下链接直接访问：</p>
+            <ul>
+                <li><a href="https://traelylv2ks1-d7hh72o47-pcs-projects-e951c936.vercel.app/api/health" target="_blank">健康检查API</a></li>
+                <li><a href="https://traelylv2ks1-d7hh72o47-pcs-projects-e951c936.vercel.app/api/menu" target="_blank">菜品列表API</a></li>
+                <li><a href="https://traelylv2ks1-d7hh72o47-pcs-projects-e951c936.vercel.app/api/menu/categories/list" target="_blank">分类列表API</a></li>
+                <li><a href="https://traelylv2ks1-d7hh72o47-pcs-projects-e951c936.vercel.app/admin/" target="_blank">管理后台</a></li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h3>📊 测试结果汇总</h3>
+            <div id="summary-result" class="result info">等待测试...</div>
+        </div>
+    </div>
+
+    <script>
+        const VERCEL_BASE_URL = 'https://traelylv2ks1-d7hh72o47-pcs-projects-e951c936.vercel.app';
+        let testResults = {};
+
+        // 通用API请求函数
+        async function apiRequest(url, options = {}) {
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...options.headers,
+                    },
+                });
+
+                const data = await response.json();
+                
+                return {
+                    success: response.ok,
+                    status: response.status,
+                    data: data,
+                    url: url
+                };
+            } catch (error) {
+                return {
+                    success: false,
+                    error: error.message,
+                    url: url
+                };
+            }
+        }
+
+        // 显示结果
+        function showResult(elementId, result, testName) {
+            const element = document.getElementById(elementId);
+            
+            if (result.success) {
+                element.className = 'result success';
+                element.textContent = `✅ ${testName}成功\n${JSON.stringify(result.data, null, 2)}`;
+                testResults[testName] = '✅ 成功';
+            } else {
+                element.className = 'result error';
+                element.textContent = `❌ ${testName}失败\n错误: ${result.error || result.data?.error}\nURL: ${result.url}`;
+                testResults[testName] = '❌ 失败';
+            }
+            
+            updateSummary();
+        }
+
+        // 更新汇总
+        function updateSummary() {
+            const summary = document.getElementById('summary-result');
+            const results = Object.entries(testResults)
+                .map(([test, result]) => `${test}: ${result}`)
+                .join('\n');
+            
+            summary.textContent = results || '等待测试...';
+        }
+
+        // 测试线上健康检查
+        async function testOnlineHealth() {
+            const result = document.getElementById('online-result');
+            result.textContent = '正在测试线上健康检查...';
+            result.className = 'result info';
+
+            const response = await apiRequest(`${VERCEL_BASE_URL}/api/health`);
+            showResult('online-result', response, '线上健康检查');
+        }
+
+        // 测试线上菜品列表
+        async function testOnlineMenu() {
+            const result = document.getElementById('online-result');
+            result.textContent = '正在测试线上菜品列表...';
+            result.className = 'result info';
+
+            const response = await apiRequest(`${VERCEL_BASE_URL}/api/menu`);
+            showResult('online-result', response, '线上菜品列表');
+        }
+
+        // 测试线上分类列表
+        async function testOnlineCategories() {
+            const result = document.getElementById('online-result');
+            result.textContent = '正在测试线上分类列表...';
+            result.className = 'result info';
+
+            const response = await apiRequest(`${VERCEL_BASE_URL}/api/menu/categories/list`);
+            showResult('online-result', response, '线上分类列表');
+        }
+
+        // 测试线上管理后台
+        async function testOnlineAdmin() {
+            const result = document.getElementById('online-result');
+            result.textContent = '正在测试线上管理后台...';
+            result.className = 'result info';
+
+            try {
+                const response = await fetch(`${VERCEL_BASE_URL}/admin/`);
+                const html = await response.text();
+                
+                if (response.ok && html.includes('社区小饭桌管理后台')) {
+                    result.className = 'result success';
+                    result.textContent = `✅ 线上管理后台成功\n返回了正确的HTML页面`;
+                    testResults['线上管理后台'] = '✅ 成功';
+                } else {
+                    result.className = 'result error';
+                    result.textContent = `❌ 线上管理后台失败\n状态码: ${response.status}`;
+                    testResults['线上管理后台'] = '❌ 失败';
+                }
+            } catch (error) {
+                result.className = 'result error';
+                result.textContent = `❌ 线上管理后台失败\n错误: ${error.message}`;
+                testResults['线上管理后台'] = '❌ 失败';
+            }
+            
+            updateSummary();
+        }
+
+        // 页面加载时显示说明
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('Vercel API测试页面已加载');
+        });
+    </script>
+</body>
+</html>

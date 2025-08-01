@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>控制台测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>管理后台登录测试</h1>
+        
+        <div class="test-section">
+            <h2>测试说明</h2>
+            <p>请打开浏览器的开发者工具（F12），然后点击下面的按钮进行测试。</p>
+            <p>所有测试结果将在控制台中显示。</p>
+        </div>
+
+        <div class="test-section">
+            <h2>API连接测试</h2>
+            <button onclick="testAPIConnection()">测试API连接</button>
+            <button onclick="testLoginAPI()">测试登录API</button>
+            <button onclick="testElementsExist()">测试页面元素</button>
+        </div>
+
+        <div class="test-section">
+            <h2>模拟登录表单</h2>
+            <input type="text" id="testUsername" value="admin" placeholder="用户名">
+            <input type="password" id="testPassword" value="password" placeholder="密码">
+            <button onclick="simulateLogin()">模拟登录</button>
+        </div>
+
+        <div class="test-section">
+            <h2>测试脚本</h2>
+            <p>你也可以直接在控制台中运行以下脚本：</p>
+            <pre><code>// 测试登录API
+async function testLogin() {
+    try {
+        const response = await fetch('http://localhost:3001/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: 'admin', password: 'password' })
+        });
+        const data = await response.json();
+        console.log('登录测试结果:', data);
+    } catch (error) {
+        console.error('登录测试错误:', error);
+    }
+}
+
+testLogin();</code></pre>
+        </div>
+    </div>
+
+    <script>
+        async function testAPIConnection() {
+            console.log('=== API连接测试 ===');
+            try {
+                const response = await fetch('http://localhost:3001/api/health');
+                const data = await response.json();
+                console.log('✅ API连接成功:', data);
+            } catch (error) {
+                console.error('❌ API连接失败:', error);
+            }
+        }
+
+        async function testLoginAPI() {
+            console.log('=== 登录API测试 ===');
+            try {
+                const response = await fetch('http://localhost:3001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: 'admin',
+                        password: 'password'
+                    })
+                });
+                
+                console.log('响应状态:', response.status, response.statusText);
+                const data = await response.json();
+                console.log('✅ 登录API响应:', data);
+                
+                if (data.success) {
+                    console.log('✅ 登录成功，Token:', data.data.token.substring(0, 20) + '...');
+                } else {
+                    console.log('❌ 登录失败:', data.message);
+                }
+            } catch (error) {
+                console.error('❌ 登录API错误:', error);
+            }
+        }
+
+        function testElementsExist() {
+            console.log('=== 页面元素测试 ===');
+            
+            // 模拟管理后台页面的元素检查
+            const elements = [
+                'loginForm', 'username', 'password', 'loginText', 'loginLoading', 'loginError'
+            ];
+            
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    console.log(`✅ 元素 ${id} 存在`);
+                } else {
+                    console.log(`❌ 元素 ${id} 不存在`);
+                }
+            });
+        }
+
+        async function simulateLogin() {
+            console.log('=== 模拟登录测试 ===');
+            
+            const username = document.getElementById('testUsername').value;
+            const password = document.getElementById('testPassword').value;
+            
+            console.log('登录参数:', { username, password });
+            
+            try {
+                console.log('发送登录请求...');
+                const response = await fetch('http://localhost:3001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                console.log('收到响应:', response.status, response.statusText);
+                const data = await response.json();
+                console.log('响应数据:', data);
+
+                if (data.success) {
+                    console.log('✅ 模拟登录成功');
+                    console.log('Token:', data.data.token.substring(0, 20) + '...');
+                    console.log('管理员信息:', data.data.admin);
+                } else {
+                    console.log('❌ 模拟登录失败:', data.message);
+                }
+            } catch (error) {
+                console.error('❌ 模拟登录错误:', error);
+            }
+        }
+
+        // 页面加载时自动运行基础测试
+        window.onload = function() {
+            console.log('=== 控制台测试页面已加载 ===');
+            console.log('请点击按钮进行各项测试，或直接在控制台运行测试脚本');
+        };
+    </script>
+</body>
+</html>

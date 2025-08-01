@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理后台登录 - 纯HTML版本</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .info-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .info-box h3 {
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .info-box p {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .test-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .test-links a {
+            display: inline-block;
+            margin: 5px 10px;
+            padding: 8px 16px;
+            background: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .test-links a:hover {
+            background: #218838;
+        }
+        
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>🍽️ 社区小饭桌</h1>
+            <p>管理后台登录</p>
+        </div>
+        
+        <form action="http://localhost:3001/api/auth/login" method="POST" enctype="application/x-www-form-urlencoded">
+            <div class="form-group">
+                <label for="username">用户名</label>
+                <input type="text" id="username" name="username" value="admin" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" value="password" required>
+            </div>
+            
+            <button type="submit" class="login-btn">登录</button>
+        </form>
+        
+        <div class="info-box">
+            <h3>📋 说明</h3>
+            <p>这是一个纯HTML版本的登录页面，不依赖JavaScript。如果您的浏览器禁用了JavaScript，可以使用这个页面进行登录。</p>
+            <p><strong>默认账号：</strong> admin / password</p>
+        </div>
+        
+        <div class="test-links">
+            <a href="http://localhost:3001/api/health" target="_blank">测试API健康</a>
+            <a href="http://localhost:3001/api/admin/dashboard" target="_blank">直接访问后台</a>
+        </div>
+        
+        <div class="info-box">
+            <h3>🔧 故障排除</h3>
+            <p>如果登录仍然有问题，请检查：</p>
+            <p>1. 后端服务器是否在 localhost:3001 运行</p>
+            <p>2. 浏览器是否允许跨域请求</p>
+            <p>3. 防火墙是否阻止了连接</p>
+        </div>
+    </div>
+</body>
+</html>

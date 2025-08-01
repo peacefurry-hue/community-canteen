@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区小饭桌 - 管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .header h1 {
+            color: #333;
+            font-size: 1.5rem;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stat-card.orders .number { color: #007bff; }
+        .stat-card.revenue .number { color: #28a745; }
+        .stat-card.pending .number { color: #ffc107; }
+        .stat-card.menu .number { color: #6f42c1; }
+        
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+        
+        .card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .card h2 {
+            color: #333;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+        
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        
+        .order-info h4 {
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .order-info p {
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .status {
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status.pending { background: #fff3cd; color: #856404; }
+        .status.confirmed { background: #d4edda; color: #155724; }
+        .status.completed { background: #d1ecf1; color: #0c5460; }
+        
+        .menu-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .menu-info h4 {
+            color: #333;
+            font-size: 0.9rem;
+        }
+        
+        .menu-info p {
+            color: #666;
+            font-size: 0.8rem;
+        }
+        
+        .price {
+            font-weight: bold;
+            color: #28a745;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .nav-tab {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #495057;
+        }
+        
+        .nav-tab.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .nav-tab:hover {
+            background: #e9ecef;
+        }
+        
+        .nav-tab.active:hover {
+            background: #0056b3;
+        }
+        
+        .refresh-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 1rem;
+        }
+        
+        .refresh-btn:hover {
+            background: #218838;
+        }
+        
+        @media (max-width: 768px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🍽️ 社区小饭桌管理后台</h1>
+        <div class="user-info">
+            <span id="adminName">管理员</span>
+            <a href="/admin/pure-html-login.html" class="logout-btn">退出登录</a>
+        </div>
+    </div>
+    
+    <div class="container">
+        <!-- 统计卡片 -->
+        <div class="stats-grid">
+            <div class="stat-card orders">
+                <h3>今日订单</h3>
+                <div class="number" id="todayOrders">12</div>
+            </div>
+            <div class="stat-card revenue">
+                <h3>今日营收</h3>
+                <div class="number" id="todayRevenue">¥1,280</div>
+            </div>
+            <div class="stat-card pending">
+                <h3>待处理订单</h3>
+                <div class="number" id="pendingOrders">3</div>
+            </div>
+            <div class="stat-card menu">
+                <h3>菜品总数</h3>
+                <div class="number" id="totalMenuItems">25</div>
+            </div>
+        </div>
+        
+        <!-- 导航标签 -->
+        <div class="nav-tabs">
+            <a href="#" class="nav-tab active" onclick="showTab('dashboard', this); return false;">仪表板</a>
+            <a href="#" class="nav-tab" onclick="showTab('orders', this); return false;">订单管理</a>
+            <a href="#" class="nav-tab" onclick="showTab('menu', this); return false;">菜品管理</a>
+            <a href="#" class="nav-tab" onclick="showTab('reports', this); return false;">营业报告</a>
+        </div>
+        
+        <!-- 仪表板内容 -->
+        <div id="dashboard-content" class="content-grid">
+            <div class="card">
+                <h2>📋 最近订单</h2>
+                <button class="refresh-btn" onclick="refreshOrders()">刷新订单</button>
+                <div id="recentOrders">
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>订单 #001</h4>
+                            <p>张三 - 13:45</p>
+                        </div>
+                        <span class="status pending">待处理</span>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>订单 #002</h4>
+                            <p>李四 - 13:30</p>
+                        </div>
+                        <span class="status confirmed">已确认</span>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>订单 #003</h4>
+                            <p>王五 - 13:15</p>
+                        </div>
+                        <span class="status completed">已完成</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>🍽️ 热门菜品</h2>
+                <div id="popularMenu">
+                    <div class="menu-item">
+                        <div class="menu-info">
+                            <h4>红烧肉</h4>
+                            <p>今日销量: 8份</p>
+                        </div>
+                        <span class="price">¥28</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-info">
+                            <h4>宫保鸡丁</h4>
+                            <p>今日销量: 6份</p>
+                        </div>
+                        <span class="price">¥22</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-info">
+                            <h4>麻婆豆腐</h4>
+                            <p>今日销量: 5份</p>
+                        </div>
+                        <span class="price">¥18</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 订单管理内容 -->
+        <div id="orders-content" class="content-grid" style="display: none;">
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>📦 订单管理</h2>
+                <button class="refresh-btn" onclick="refreshAllOrders()">刷新所有订单</button>
+                <div id="allOrders">
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>订单 #001 - 张三</h4>
+                            <p>红烧肉 x1, 米饭 x1 - 总计: ¥30 - 13:45</p>
+                        </div>
+                        <span class="status pending">待处理</span>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>订单 #002 - 李四</h4>
+                            <p>宫保鸡丁 x1, 米饭 x1 - 总计: ¥24 - 13:30</p>
+                        </div>
+                        <span class="status confirmed">已确认</span>
+                    </div>
+                    <div class="order-item">
+                        <div class="order-info">
+                            <h4>订单 #003 - 王五</h4>
+                            <p>麻婆豆腐 x1, 米饭 x1 - 总计: ¥20 - 13:15</p>
+                        </div>
+                        <span class="status completed">已完成</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 菜品管理内容 -->
+        <div id="menu-content" class="content-grid" style="display: none;">
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2>🍽️ 菜品管理</h2>
+                <button class="refresh-btn" onclick="refreshMenu()">刷新菜品</button>
+                <div id="menuList">
+                    <div class="menu-item">
+                        <div class="menu-info">
+                            <h4>红烧肉</h4>
+                            <p>经典家常菜，肥瘦相间，香甜可口</p>
+                        </div>
+                        <span class="price">¥28</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-info">
+                            <h4>宫保鸡丁</h4>
+                            <p>川菜经典，鸡肉嫩滑，花生香脆</p>
+                        </div>
+                        <span class="price">¥22</span>
+                    </div>
+                    <div class="menu-item">
+                        <div class="menu-info">
+                            <h4>麻婆豆腐</h4>
+                            <p>四川名菜，麻辣鲜香，下饭神器</p>
+                        </div>
+                        <span class="price">¥18</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 营业报告内容 -->
+        <div id="reports-content" class="content-grid" style="display: none;">
+            <div class="card">
+                <h2>📊 今日营业报告</h2>
+                <div style="padding: 1rem 0;">
+                    <p><strong>营业时间:</strong> 11:00 - 14:00</p>
+                    <p><strong>订单总数:</strong> 12单</p>
+                    <p><strong>营业额:</strong> ¥1,280</p>
+                    <p><strong>平均客单价:</strong> ¥107</p>
+                    <p><strong>最热门菜品:</strong> 红烧肉 (8份)</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2>📈 本周趋势</h2>
+                <div style="padding: 1rem 0;">
+                    <p><strong>周一:</strong> 8单 - ¥680</p>
+                    <p><strong>周二:</strong> 10单 - ¥850</p>
+                    <p><strong>周三:</strong> 12单 - ¥1,280</p>
+                    <p><strong>周四:</strong> 预计</p>
+                    <p><strong>周五:</strong> 预计</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 简单的标签切换功能
+        function showTab(tabName, clickedElement) {
+            console.log('切换到标签:', tabName);
+            
+            // 隐藏所有内容
+            const contents = ['dashboard-content', 'orders-content', 'menu-content', 'reports-content'];
+            contents.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                    console.log('隐藏:', id);
+                }
+            });
+            
+            // 显示选中的内容
+            const targetContent = document.getElementById(tabName + '-content');
+            if (targetContent) {
+                targetContent.style.display = 'grid';
+                console.log('显示:', tabName + '-content');
+            } else {
+                console.error('找不到内容元素:', tabName + '-content');
+            }
+            
+            // 更新标签样式
+            const tabs = document.querySelectorAll('.nav-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            if (clickedElement) {
+                clickedElement.classList.add('active');
+            }
+            
+            // 阻止默认链接行为
+            return false;
+        }
+        
+        // 刷新功能（模拟）
+        function refreshOrders() {
+            alert('订单已刷新！');
+        }
+        
+        function refreshAllOrders() {
+            alert('所有订单已刷新！');
+        }
+        
+        function refreshMenu() {
+            alert('菜品列表已刷新！');
+        }
+        
+        // 页面加载时的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查是否有保存的token
+            const token = localStorage.getItem('adminToken');
+            if (token) {
+                document.getElementById('adminName').textContent = '管理员 (已登录)';
+            } else {
+                document.getElementById('adminName').textContent = '管理员 (未验证)';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区小饭桌 - 管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 40px;
+            background: #f8fafc;
+        }
+
+        .nav-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .nav-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .nav-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #1f2937;
+        }
+
+        .nav-desc {
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .stats-section {
+            padding: 40px;
+            background: white;
+        }
+
+        .stats-title {
+            font-size: 1.8rem;
+            margin-bottom: 30px;
+            color: #1f2937;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .quick-actions {
+            background: #f8fafc;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .actions-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #4338ca;
+        }
+
+        .action-btn.secondary {
+            background: #6b7280;
+        }
+
+        .action-btn.secondary:hover {
+            background: #4b5563;
+        }
+
+        .footer {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🍽️ 社区小饭桌</h1>
+            <p>管理后台系统 - 主页</p>
+        </div>
+
+        <div class="stats-section">
+            <h2 class="stats-title">📊 今日数据概览</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">156</div>
+                    <div class="stat-label">今日订单</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">¥3,240</div>
+                    <div class="stat-label">今日营业额</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">89</div>
+                    <div class="stat-label">活跃用户</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">菜品种类</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="nav-menu">
+            <a href="no-js-orders.html" class="nav-card">
+                <span class="nav-icon">📋</span>
+                <div class="nav-title">订单管理</div>
+                <div class="nav-desc">查看和管理所有订单，更新订单状态</div>
+            </a>
+
+            <a href="no-js-menu.html" class="nav-card">
+                <span class="nav-icon">🍜</span>
+                <div class="nav-title">菜品管理</div>
+                <div class="nav-desc">添加、编辑、删除菜品信息</div>
+            </a>
+
+            <a href="no-js-reports.html" class="nav-card">
+                <span class="nav-icon">📈</span>
+                <div class="nav-title">营业报告</div>
+                <div class="nav-desc">查看销售数据和营业统计</div>
+            </a>
+
+            <a href="no-js-settings.html" class="nav-card">
+                <span class="nav-icon">⚙️</span>
+                <div class="nav-title">系统设置</div>
+                <div class="nav-desc">管理系统配置和用户权限</div>
+            </a>
+        </div>
+
+        <div class="quick-actions">
+            <h3 class="actions-title">🚀 快速操作</h3>
+            <div class="action-buttons">
+                <a href="no-js-orders.html" class="action-btn">查看新订单</a>
+                <a href="no-js-menu.html" class="action-btn">添加菜品</a>
+                <a href="/api/health" class="action-btn secondary">API状态</a>
+                <a href="pure-html-login.html" class="action-btn secondary">重新登录</a>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 社区小饭桌管理系统 | 纯HTML版本 - 无需JavaScript</p>
+        </div>
+    </div>
+</body>
+</html>

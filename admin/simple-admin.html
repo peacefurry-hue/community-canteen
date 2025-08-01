@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>社区小饭桌 - 管理后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .login-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .logo h1 {
+            color: #333;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e5e9;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .login-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1rem;
+        }
+        
+        .login-btn:hover {
+            background: #5a6fd8;
+        }
+        
+        .login-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .error {
+            background: #fee;
+            color: #c33;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .success {
+            background: #efe;
+            color: #3c3;
+            padding: 0.75rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .dashboard {
+            display: none;
+            text-align: center;
+        }
+        
+        .dashboard h2 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        
+        .logout-btn:hover {
+            background: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <!-- 登录表单 -->
+        <div id="loginForm">
+            <div class="logo">
+                <h1>🍽️ 社区小饭桌</h1>
+                <p>管理后台登录</p>
+            </div>
+            
+            <form id="loginFormElement">
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">
+                    <span id="loginText">登录</span>
+                    <span id="loginLoading" class="loading" style="display: none;"></span>
+                </button>
+            </form>
+            
+            <div id="errorMsg" class="error"></div>
+            <div id="successMsg" class="success"></div>
+        </div>
+        
+        <!-- 仪表板 -->
+        <div id="dashboard" class="dashboard">
+            <h2>欢迎进入管理后台</h2>
+            <p>登录成功！</p>
+            <p>管理员：<span id="adminName"></span></p>
+            <button class="logout-btn" onclick="logout()">退出登录</button>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:3001/api';
+        let authToken = localStorage.getItem('adminToken');
+        
+        // 页面加载时检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成');
+            if (authToken) {
+                console.log('发现已保存的token，验证中...');
+                verifyToken();
+            }
+        });
+        
+        // 登录表单提交
+        document.getElementById('loginFormElement').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('登录表单提交');
+            
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            
+            if (!username || !password) {
+                showError('请输入用户名和密码');
+                return;
+            }
+            
+            await login(username, password);
+        });
+        
+        // 登录函数
+        async function login(username, password) {
+            console.log('开始登录:', username);
+            
+            const loginBtn = document.getElementById('loginBtn');
+            const loginText = document.getElementById('loginText');
+            const loginLoading = document.getElementById('loginLoading');
+            
+            // 显示加载状态
+            loginBtn.disabled = true;
+            loginText.textContent = '登录中...';
+            loginLoading.style.display = 'inline-block';
+            hideMessages();
+            
+            try {
+                console.log('发送登录请求到:', API_BASE + '/auth/login');
+                
+                const response = await fetch(API_BASE + '/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+                
+                console.log('响应状态:', response.status);
+                
+                const data = await response.json();
+                console.log('响应数据:', data);
+                
+                if (response.ok && data.success) {
+                    console.log('登录成功');
+                    authToken = data.data.token;
+                    localStorage.setItem('adminToken', authToken);
+                    localStorage.setItem('adminInfo', JSON.stringify(data.data.admin));
+                    
+                    showSuccess('登录成功！');
+                    setTimeout(() => {
+                        showDashboard(data.data.admin);
+                    }, 1000);
+                } else {
+                    console.log('登录失败:', data.message);
+                    showError(data.message || '登录失败');
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                showError('网络错误，请检查服务器连接');
+            } finally {
+                // 恢复按钮状态
+                loginBtn.disabled = false;
+                loginText.textContent = '登录';
+                loginLoading.style.display = 'none';
+            }
+        }
+        
+        // 验证token
+        async function verifyToken() {
+            try {
+                console.log('验证token...');
+                const response = await fetch(API_BASE + '/auth/verify', {
+                    headers: {
+                        'Authorization': 'Bearer ' + authToken
+                    }
+                });
+                
+                if (response.ok) {
+                    const adminInfo = JSON.parse(localStorage.getItem('adminInfo') || '{}');
+                    showDashboard(adminInfo);
+                } else {
+                    console.log('token验证失败');
+                    logout();
+                }
+            } catch (error) {
+                console.error('token验证错误:', error);
+                logout();
+            }
+        }
+        
+        // 显示仪表板
+        function showDashboard(adminInfo) {
+            console.log('显示仪表板');
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+            document.getElementById('adminName').textContent = adminInfo.name || adminInfo.username || '管理员';
+        }
+        
+        // 退出登录
+        function logout() {
+            console.log('退出登录');
+            authToken = null;
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminInfo');
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            hideMessages();
+        }
+        
+        // 显示错误信息
+        function showError(message) {
+            const errorMsg = document.getElementById('errorMsg');
+            errorMsg.textContent = message;
+            errorMsg.style.display = 'block';
+            document.getElementById('successMsg').style.display = 'none';
+        }
+        
+        // 显示成功信息
+        function showSuccess(message) {
+            const successMsg = document.getElementById('successMsg');
+            successMsg.textContent = message;
+            successMsg.style.display = 'block';
+            document.getElementById('errorMsg').style.display = 'none';
+        }
+        
+        // 隐藏所有消息
+        function hideMessages() {
+            document.getElementById('errorMsg').style.display = 'none';
+            document.getElementById('successMsg').style.display = 'none';
+        }
+        
+        // 测试API连接
+        async function testConnection() {
+            try {
+                console.log('测试API连接...');
+                const response = await fetch(API_BASE + '/health');
+                const data = await response.json();
+                console.log('API连接测试结果:', data);
+                return response.ok;
+            } catch (error) {
+                console.error('API连接测试失败:', error);
+                return false;
+            }
+        }
+        
+        // 页面加载时测试连接
+        testConnection();
+    </script>
+</body>
+</html>

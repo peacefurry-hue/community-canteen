@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>营业报告 - 社区小饭桌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            padding: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .report-filters {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .filter-group label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+
+        .chart-section {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1f2937;
+        }
+
+        .chart-placeholder {
+            background: white;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 60px 20px;
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .data-table th {
+            background: #f1f5f9;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .trend-up {
+            color: #10b981;
+        }
+
+        .trend-down {
+            color: #ef4444;
+        }
+
+        .trend-neutral {
+            color: #6b7280;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .top-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .top-item-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .top-item-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .top-item-list {
+            list-style: none;
+        }
+
+        .top-item-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+
+        .top-item-list li:last-child {
+            border-bottom: none;
+        }
+
+        .item-rank {
+            background: #4f46e5;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .item-info {
+            flex: 1;
+            display: flex;
+            align-items: center;
+        }
+
+        .item-value {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .export-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .export-title {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: #1f2937;
+        }
+
+        .export-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .export-btn {
+            background: #4f46e5;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .export-btn:hover {
+            background: #4338ca;
+        }
+
+        .export-btn.secondary {
+            background: #6b7280;
+        }
+
+        .export-btn.secondary:hover {
+            background: #4b5563;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📈 营业报告</h1>
+            <a href="no-js-dashboard.html" class="back-btn">← 返回主页</a>
+        </div>
+
+        <div class="content">
+            <!-- 报告筛选器 -->
+            <div class="report-filters">
+                <div class="filter-group">
+                    <label>报告类型</label>
+                    <select>
+                        <option>日报</option>
+                        <option>周报</option>
+                        <option>月报</option>
+                        <option>年报</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>开始日期</label>
+                    <input type="date" value="2024-01-01">
+                </div>
+                <div class="filter-group">
+                    <label>结束日期</label>
+                    <input type="date" value="2024-01-01">
+                </div>
+                <div class="filter-group">
+                    <label>分类筛选</label>
+                    <select>
+                        <option>全部分类</option>
+                        <option>主食</option>
+                        <option>汤品</option>
+                        <option>小菜</option>
+                        <option>饮品</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 核心指标 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">¥15,680</div>
+                    <div class="stat-label">本周营业额</div>
+                    <div class="stat-change">↗ 比上周增长 12.5%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">¥62,340</div>
+                    <div class="stat-label">本月营业额</div>
+                    <div class="stat-change">↗ 比上月增长 8.3%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">892</div>
+                    <div class="stat-label">本周订单数</div>
+                    <div class="stat-change">↗ 比上周增长 15.2%</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">¥22.4</div>
+                    <div class="stat-label">平均客单价</div>
+                    <div class="stat-change">↘ 比上周下降 2.1%</div>
+                </div>
+            </div>
+
+            <!-- 图表区域 -->
+            <div class="chart-section">
+                <h3 class="chart-title">📊 销售趋势图表</h3>
+                <div class="chart-placeholder">
+                    📈 这里将显示销售趋势图表
+                    <br><small>（图表功能开发中，将支持折线图、柱状图、饼图等多种展示方式）</small>
+                </div>
+            </div>
+
+            <!-- 热销商品排行 -->
+            <h3 class="section-title">🏆 热销商品排行</h3>
+            <div class="top-items">
+                <div class="top-item-card">
+                    <h4 class="top-item-title">销量排行榜</h4>
+                    <ul class="top-item-list">
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">1</span>
+                                宫保鸡丁套餐
+                            </div>
+                            <span class="item-value">156份</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">2</span>
+                                红烧肉套餐
+                            </div>
+                            <span class="item-value">142份</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">3</span>
+                                麻婆豆腐套餐
+                            </div>
+                            <span class="item-value">128份</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">4</span>
+                                糖醋里脊套餐
+                            </div>
+                            <span class="item-value">95份</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">5</span>
+                                紫菜蛋花汤
+                            </div>
+                            <span class="item-value">89份</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="top-item-card">
+                    <h4 class="top-item-title">营收排行榜</h4>
+                    <ul class="top-item-list">
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">1</span>
+                                宫保鸡丁套餐
+                            </div>
+                            <span class="item-value">¥4,368</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">2</span>
+                                红烧肉套餐
+                            </div>
+                            <span class="item-value">¥4,544</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">3</span>
+                                麻婆豆腐套餐
+                            </div>
+                            <span class="item-value">¥3,200</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">4</span>
+                                糖醋里脊套餐
+                            </div>
+                            <span class="item-value">¥2,850</span>
+                        </li>
+                        <li>
+                            <div class="item-info">
+                                <span class="item-rank">5</span>
+                                柠檬蜂蜜茶
+                            </div>
+                            <span class="item-value">¥1,068</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 详细数据表格 -->
+            <h3 class="section-title">📋 详细营业数据</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>订单数</th>
+                        <th>营业额</th>
+                        <th>平均客单价</th>
+                        <th>环比增长</th>
+                        <th>趋势</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>2024-01-01</strong></td>
+                        <td>156</td>
+                        <td><strong>¥3,240</strong></td>
+                        <td>¥20.8</td>
+                        <td class="trend-up">+12.5%</td>
+                        <td class="trend-up">📈</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2023-12-31</strong></td>
+                        <td>142</td>
+                        <td><strong>¥2,980</strong></td>
+                        <td>¥21.0</td>
+                        <td class="trend-up">+8.3%</td>
+                        <td class="trend-up">📈</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2023-12-30</strong></td>
+                        <td>168</td>
+                        <td><strong>¥3,560</strong></td>
+                        <td>¥21.2</td>
+                        <td class="trend-down">-2.1%</td>
+                        <td class="trend-down">📉</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2023-12-29</strong></td>
+                        <td>134</td>
+                        <td><strong>¥2,850</strong></td>
+                        <td>¥21.3</td>
+                        <td class="trend-up">+5.8%</td>
+                        <td class="trend-up">📈</td>
+                    </tr>
+                    <tr>
+                        <td><strong>2023-12-28</strong></td>
+                        <td>125</td>
+                        <td><strong>¥2,695</strong></td>
+                        <td>¥21.6</td>
+                        <td class="trend-neutral">+0.2%</td>
+                        <td class="trend-neutral">➡️</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- 导出功能 -->
+            <div class="export-section">
+                <h3 class="export-title">📤 导出报告</h3>
+                <div class="export-buttons">
+                    <a href="#" class="export-btn">导出Excel</a>
+                    <a href="#" class="export-btn">导出PDF</a>
+                    <a href="#" class="export-btn secondary">打印报告</a>
+                    <a href="#" class="export-btn secondary">发送邮件</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

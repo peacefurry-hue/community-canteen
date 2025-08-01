@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>调试测试页面</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            width: 100%;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .result {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            min-height: 50px;
+        }
+        .success {
+            background: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 调试测试页面</h1>
+        
+        <button onclick="testBasic()">1. 基础测试 - 点击我</button>
+        <div id="basicResult" class="result">等待测试...</div>
+        
+        <button onclick="testFetch()">2. 网络测试 - 测试API连接</button>
+        <div id="fetchResult" class="result">等待测试...</div>
+        
+        <button onclick="testLogin()">3. 登录测试 - 测试登录API</button>
+        <div id="loginResult" class="result">等待测试...</div>
+        
+        <button onclick="showConsole()">4. 显示控制台信息</button>
+        <div id="consoleResult" class="result">等待测试...</div>
+    </div>
+
+    <script>
+        // 添加全局错误处理
+        window.addEventListener('error', function(e) {
+            console.error('全局错误:', e.error);
+            document.getElementById('consoleResult').innerHTML = `❌ JavaScript错误: ${e.error.message}\n文件: ${e.filename}\n行号: ${e.lineno}`;
+            document.getElementById('consoleResult').className = 'result error';
+        });
+        
+        // 页面加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('页面加载完成');
+            document.getElementById('consoleResult').innerHTML = '✅ 页面加载完成，JavaScript正常运行';
+            document.getElementById('consoleResult').className = 'result success';
+        });
+        
+        function testBasic() {
+            console.log('基础测试开始');
+            const now = new Date().toLocaleString();
+            document.getElementById('basicResult').innerHTML = `✅ 基础测试成功！\n时间: ${now}\n浏览器: ${navigator.userAgent}`;
+            document.getElementById('basicResult').className = 'result success';
+        }
+        
+        async function testFetch() {
+            console.log('网络测试开始');
+            document.getElementById('fetchResult').innerHTML = '🔄 正在测试网络连接...';
+            document.getElementById('fetchResult').className = 'result info';
+            
+            try {
+                const response = await fetch('http://localhost:3001/api/health');
+                console.log('健康检查响应:', response);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('健康检查数据:', data);
+                    document.getElementById('fetchResult').innerHTML = `✅ 网络连接成功！\n状态码: ${response.status}\n响应: ${JSON.stringify(data, null, 2)}`;
+                    document.getElementById('fetchResult').className = 'result success';
+                } else {
+                    document.getElementById('fetchResult').innerHTML = `❌ 网络连接失败\n状态码: ${response.status}\n状态文本: ${response.statusText}`;
+                    document.getElementById('fetchResult').className = 'result error';
+                }
+            } catch (error) {
+                console.error('网络测试错误:', error);
+                document.getElementById('fetchResult').innerHTML = `❌ 网络错误: ${error.message}`;
+                document.getElementById('fetchResult').className = 'result error';
+            }
+        }
+        
+        async function testLogin() {
+            console.log('登录测试开始');
+            document.getElementById('loginResult').innerHTML = '🔄 正在测试登录...';
+            document.getElementById('loginResult').className = 'result info';
+            
+            try {
+                const loginData = {
+                    username: 'admin',
+                    password: 'password'
+                };
+                
+                console.log('发送登录请求:', loginData);
+                
+                const response = await fetch('http://localhost:3001/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+                
+                console.log('登录响应:', response);
+                
+                const data = await response.json();
+                console.log('登录数据:', data);
+                
+                if (response.ok && data.success) {
+                    document.getElementById('loginResult').innerHTML = `✅ 登录成功！\n状态码: ${response.status}\n管理员: ${data.data.admin.name}\nToken: ${data.data.token.substring(0, 20)}...`;
+                    document.getElementById('loginResult').className = 'result success';
+                } else {
+                    document.getElementById('loginResult').innerHTML = `❌ 登录失败\n状态码: ${response.status}\n错误: ${data.message || '未知错误'}\n完整响应: ${JSON.stringify(data, null, 2)}`;
+                    document.getElementById('loginResult').className = 'result error';
+                }
+            } catch (error) {
+                console.error('登录测试错误:', error);
+                document.getElementById('loginResult').innerHTML = `❌ 登录错误: ${error.message}`;
+                document.getElementById('loginResult').className = 'result error';
+            }
+        }
+        
+        function showConsole() {
+            const logs = [];
+            
+            // 收集一些基本信息
+            logs.push(`当前URL: ${window.location.href}`);
+            logs.push(`用户代理: ${navigator.userAgent}`);
+            logs.push(`本地存储Token: ${localStorage.getItem('adminToken') ? '存在' : '不存在'}`);
+            logs.push(`页面标题: ${document.title}`);
+            logs.push(`当前时间: ${new Date().toLocaleString()}`);
+            
+            document.getElementById('consoleResult').innerHTML = `📋 控制台信息:\n${logs.join('\n')}`;
+            document.getElementById('consoleResult').className = 'result info';
+        }
+        
+        // 立即显示页面状态
+        setTimeout(() => {
+            if (document.getElementById('consoleResult').innerHTML === '等待测试...') {
+                document.getElementById('consoleResult').innerHTML = '⚠️ JavaScript可能未正常加载';
+                document.getElementById('consoleResult').className = 'result error';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
