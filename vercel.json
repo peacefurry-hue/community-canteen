@@ -9,6 +9,10 @@
       }
     },
     {
+      "src": "admin/**",
+      "use": "@vercel/static"
+    },
+    {
       "src": "api/index.js",
       "use": "@vercel/node"
     }
