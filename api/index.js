@@ -18,7 +18,8 @@ export default function handler(req, res) {
     return res.json({
       status: 'ok',
       message: '社区小饭桌API服务运行正常',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      version: '1.1.0'
     });
   }
   
